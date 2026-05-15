@@ -174,7 +174,7 @@
   },
   "WPFTweaksServices": {
     "Content": "Services - Set to Manual",
-    "Description": "Turns a bunch of system services to manual that don't need to be running all the time. This is pretty harmless as if the service is needed, it will simply start on demand.",
+    "Description": "Sets some services to Manual startup and adjusts the SvcHostSplitThresholdInKB registry value to better match system memory, which can significantly reduce the number of svchost.exe processes.",
     "category": "Essential Tweaks",
     "panel": "1",
     "service": [
@@ -194,16 +194,6 @@
         "OriginalType": "Automatic"
       },
       {
-        "Name": "RemoteAccess",
-        "StartupType": "Disabled",
-        "OriginalType": "Disabled"
-      },
-      {
-        "Name": "RemoteRegistry",
-        "StartupType": "Disabled",
-        "OriginalType": "Disabled"
-      },
-      {
         "Name": "StorSvc",
         "StartupType": "Manual",
         "OriginalType": "Automatic"
@@ -212,26 +202,6 @@
         "Name": "SharedAccess",
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
-      },
-      {
-        "Name": "TermService",
-        "StartupType": "Manual",
-        "OriginalType": "Manual"
-      },
-      {
-        "Name": "TroubleshootingSvc",
-        "StartupType": "Manual",
-        "OriginalType": "Manual"
-      },
-      {
-        "Name": "seclogon",
-        "StartupType": "Manual",
-        "OriginalType": "Manual"
-      },
-      {
-        "Name": "ssh-agent",
-        "StartupType": "Disabled",
-        "OriginalType": "Disabled"
       }
     ],
     "InvokeScript": [
@@ -691,40 +661,27 @@
     "link": "https://winutil.christitus.com/dev/tweaks/z--advanced-tweaks---caution/removeonedrive"
   },
   "WPFTweaksRemoveHome": {
-    "Content": "File Explorer Home - Disable",
-    "Description": "Removes the Home from Explorer and sets This PC as default.",
+    "Content": "File Explorer Home and Gallery - Disable",
+    "Description": "Removes the Home and Gallery from Explorer and sets This PC as default.",
     "category": "z__Advanced Tweaks - CAUTION",
     "panel": "1",
-    "InvokeScript": [
-      "
-      Remove-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Desktop\\NameSpace\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}\"
-      Set-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" -Name LaunchTo -Value 1
-      "
-    ],
-    "UndoScript": [
-      "
-      New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Desktop\\NameSpace\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}\"
-      Set-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" -Name LaunchTo -Value 0
-      "
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
+        "Name": "System.IsPinnedToNameSpaceTree",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "LaunchTo",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ],
     "link": "https://winutil.christitus.com/dev/tweaks/z--advanced-tweaks---caution/removehome"
-  },
-  "WPFTweaksRemoveGallery": {
-    "Content": "File Explorer Gallery - Disable",
-    "Description": "Removes the Gallery from Explorer and sets This PC as default.",
-    "category": "z__Advanced Tweaks - CAUTION",
-    "panel": "1",
-    "InvokeScript": [
-      "
-      Remove-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Desktop\\NameSpace\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}\"
-      "
-    ],
-    "UndoScript": [
-      "
-      New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Desktop\\NameSpace\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}\"
-      "
-    ],
-    "link": "https://winutil.christitus.com/dev/tweaks/z--advanced-tweaks---caution/removegallery"
   },
   "WPFTweaksDisplay": {
     "Content": "Visual Effects - Set to Best Performance",
@@ -850,8 +807,8 @@
   },
   "WPFTweaksDeBloat": {
     "Content": "Unwanted Pre-Installed Apps - Remove",
-    "Description": "This will remove a bunch of Windows pre-installed applications which most people dont want on there system.",
-    "category": "z__Advanced Tweaks - CAUTION",
+    "Description": "This will remove a bunch of Windows pre-installed applications which most people dont want on their system.",
+    "category": "Essential Tweaks",
     "panel": "1",
     "appx": [
       "Microsoft.WindowsFeedbackHub",
@@ -887,7 +844,7 @@
       }
       "
     ],
-    "link": "https://winutil.christitus.com/dev/tweaks/z--advanced-tweaks---caution/debloat"
+    "link": "https://winutil.christitus.com/dev/tweaks/essential-tweaks/debloat"
   },
   "WPFTweaksRestorePoint": {
     "Content": "Restore Point - Create",
@@ -961,32 +918,45 @@
     ],
     "link": "https://winutil.christitus.com/dev/tweaks/z--advanced-tweaks---caution/storage"
   },
-  "WPFTweaksRemoveCopilot": {
-    "Content": "Microsoft Copilot - Disable",
-    "Description": "Removes Copilot AppXPackages and related ai packages",
+  "WPFTweaksWindowsAI": {
+    "Content": "Windows AI - Disable",
+    "Description": "Removes or disables all ai features and packages",
     "category": "z__Advanced Tweaks - CAUTION",
     "panel": "1",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "Name": "SettingsPageVisibility",
+        "Value": "hide:aicomponents",
+        "Type": "String",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\WindowsNotepad",
+        "Name": "DisableAIFeatures",
+        "Value": 1,
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
     "InvokeScript": [
       "
-      Get-AppxPackage -AllUsers *Copilot* | Remove-AppxPackage -AllUsers
-      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage -AllUsers
-
       $Appx = (Get-AppxPackage MicrosoftWindows.Client.CoreAI).PackageFullName
       $Sid = (Get-LocalUser $Env:UserName).Sid.Value
 
       New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force
+
+      Get-AppxPackage -AllUsers *Copilot* | Remove-AppxPackage -AllUsers
+      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage -AllUsers
       Remove-AppxPackage $Appx
 
-      Write-Host \"Copilot Removed\"
+      Set-Service -Name WSAIFabricSvc -StartupType Disabled
+      Disable-WindowsOptionalFeature -FeatureName Recall -Online
+
+      Write-Host \"Windows AI Disabled\"
       "
     ],
-    "UndoScript": [
-      "
-      Write-Host \"Installing Copilot...\"
-      winget install --name Copilot --source msstore --accept-package-agreements --accept-source-agreements --silent
-      "
-    ],
-    "link": "https://winutil.christitus.com/dev/tweaks/z--advanced-tweaks---caution/removecopilot"
+    "link": "https://winutil.christitus.com/dev/tweaks/z--advanced-tweaks---caution/windowsai"
   },
   "WPFTweaksWPBT": {
     "Content": "Windows Platform Binary Table (WPBT) - Disable",
